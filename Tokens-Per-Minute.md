@@ -32,6 +32,52 @@ Quota is assigned per model, per region, and distributed across deployments. For
 * #### Optimize TPM
  Reduce max_tokens and best_of parameters. Implement retry logic and gradual workload increases.
 
+## How to adjust tokens/minute rate limit
+**1 During deployment**
+In the Azure AI Foundry portal, when you deploy a model (e.g. GPT‑4o‑mini), you’ll see a setting labeled "Tokens per Minute Rate Limit (thousands)".
+- You can slide or enter a value here (e.g., enter 50 to set 50,000 TPM).
+- This corresponds directly to the “Rate limit (Tokens per minute)” field — 50 becomes 50,000 TPM. 
+
+**2 Post-deployment edits**
+If your model is already deployed, you can edit its deployment configuration to adjust that same slider/field and save changes.
+- The two fields (“thousands” and actual TPM) essentially represent the same value, and changing one updates the other
+
+## You Can't Increase It Beyond 50K (Common Case)
+Azure enforces quotas on rate limits per subscription, region, and model type. The 50K limit you're seeing is likely the maximum allowed for your current quota.
+To Increase the Limit Beyond 50K.You must submit a quota increase request in the Azure Portal.
+
+## What Do These Limits Mean?
+**1. Tokens per Minute (TPM) = 50,000**
+This controls how much text you can process per minute — including both:
+- **Prompt tokens:** The input you send.
+- **Completion tokens:** The output you receive from the model.
+**Example:**
+- If each request consumes 1,000 tokens total (input + output), you can make up to 50 such requests per minute before hitting the token limit.
+
+**2. Requests per Minute (RPM) = 300**
+This controls how many individual API calls you can make per minute, regardless of token size.
+
+**Example:**
+- You can send up to 300 requests per minute
+- But if each request uses 500 tokens, you'll consume 300 × 500 = 150,000 TPM, which would exceed your TPM limit (you'd be throttled)
+
+## Combined Effect
+Azure enforces both limits, so you're subject to the more restrictive of the two.
+
+|Scenario	|Token Use	|Requests	|Result
+100 requests × 500 tokens	50,000	100	✅ OK – hits TPM but not RPM
+200 requests × 400 tokens	80,000	200	❌ Exceeds TPM (limit = 50,000)
+300 requests × 100 tokens	30,000	300	✅ OK – hits RPM but not TPM
+310 requests × 100 tokens	31,000	310	❌ Exceeds RPM (limit = 300)
+
+
+
+## Best Practices & Troubleshooting
+- Know your limits: Each model and subscription tier has a maximum TPM – e.g. GPT‑4o‑mini default is 2 Million TPM, but your subscription might limit it .
+- Throttling awareness: If you hit rate limits in runtime, you’ll get a 429 error. The API returns a Retry-After header indicating how long to wait.
+- Need more throughput? Submit a support request to increase quotas (via Azure portal → Quotas and limits tickets)
+
+
 ## Requesting TPM Increases
 Submit a quota increase request via !["Azure Support"](https://customervoice.microsoft.com/Pages/ResponsePage.aspx?id=v4j5cvGGr0GRqy180BHbR4xPXO648sJKt4GoXAed-0pUMFE1Rk9CU084RjA0TUlVSUlMWEQzVkJDNCQlQCN0PWcu), specifying:
 - Model name/version and deployment type
