@@ -64,13 +64,15 @@ This controls how many individual API calls you can make per minute, regardless 
 ## Combined Effect
 Azure enforces both limits, so you're subject to the more restrictive of the two.
 
-|Scenario	|Token Use	|Requests	|Result
-100 requests × 500 tokens	50,000	100	✅ OK – hits TPM but not RPM
-200 requests × 400 tokens	80,000	200	❌ Exceeds TPM (limit = 50,000)
-300 requests × 100 tokens	30,000	300	✅ OK – hits RPM but not TPM
-310 requests × 100 tokens	31,000	310	❌ Exceeds RPM (limit = 300)
+|Scenario	|Token Use	|Requests	|Result|
+|---------|---------|---------|---------|
+|100 requests × 500 tokens|	50,000|	100|OK – hits TPM but not RPM|
+|200 requests × 400 tokens|	80,000|	200|Exceeds TPM (limit = 50,000)|
+|300 requests × 100 tokens|	30,000|	300| OK – hits RPM but not TPM|
+|310 requests × 100 tokens|	31,000|	310 |Exceeds RPM (limit = 300)|
 
-
+## What Happens If You Exceed Limits?
+- You’ll get HTTP 429 (Too Many Requests) errors.
 
 ## Best Practices & Troubleshooting
 - Know your limits: Each model and subscription tier has a maximum TPM – e.g. GPT‑4o‑mini default is 2 Million TPM, but your subscription might limit it .
@@ -84,11 +86,51 @@ Submit a quota increase request via !["Azure Support"](https://customervoice.mic
 - Target TPM/RPM and workload rationale
 
 
+
+## Scenario
+If you're getting "limit exceeded" errors even though your prompt is ~1,000 tokens and your limits are:
+- Tokens per Minute (TPM): 50,000
+- Requests per Minute (RPM): 300
+- knowledge files(no of files uploaded eg 51)
+…and you’re still within these limits, the likely cause is your knowledge files.
+
+**What’s Actually Happening?**
+When using Azure AI Foundry with a “Knowledge” resource (like your 51 files):
+The system automatically augments your prompt using a Retrieval-Augmented Generation (RAG) pipeline:
+- It searches the knowledge files.
+- It adds relevant chunks from those files to your original prompt before sending it to the model.
+
+  As a result:
+
+**Your effective prompt size becomes:**
+Prompt tokens + Retrieved knowledge tokens
+
+So, even if your raw prompt is ~1,000 tokens, the total tokens per request could easily be:
+3,000–5,000 tokens, or even more — depending on how many documents are retrieved and included in the augmented prompt.
  
+**Example**
+  |Type     |	Tokens  |
+  |---------|---------|
+  |Your prompt|	1,000|
+|Retrieved content (from 51 files)|	~3,000|
+|Completion (response)|	~1,000|
+|Total tokens|	~5,000|
 
+If you're making just 10 requests like this per minute, you're already at:
+10 × 5,000 = 50,000 TPM → your full quota
 
+**How to Fix or Optimize**
+🔹 **Option 1:** Reduce retrieved knowledge tokens
+In Azure Foundry, edit your knowledge settings to:
+Limit the number of retrieved chunks.
+Set a maximum token budget for augmentation (e.g., 2,000)
 
+🔹 **Option 2:** Use a lower context prompt
+Only pull the most necessary files.
+Filter files before uploading or querying.
 
+🔹 **Option 3:** Increase your quota
+Submit a request via Azure Portal to increase TPM and/or RPM.
 
 
 
