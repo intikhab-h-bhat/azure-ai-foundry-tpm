@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/301113f6-1273-4e67-a8c2-5106af8aa08f)# Tokens Per Minute (TPM) in Azure AI Foundry
+# Tokens Per Minute (TPM) in Azure AI Foundry
 In Azure AI Foundry Tokens Per Minute (TPM) is a critical metric for managing model throughput, rate limits, and quota allocation.
 
 ## Definition of TPM
