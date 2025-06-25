@@ -120,6 +120,7 @@ If you're making just 10 requests like this per minute, you're already at:
 10 × 5,000 = 50,000 TPM → your full quota
 
 **How to Fix or Optimize**
+
 🔹 **Option 1:** Reduce retrieved knowledge tokens
 In Azure Foundry, edit your knowledge settings to:
 Limit the number of retrieved chunks.
@@ -132,7 +133,14 @@ Filter files before uploading or querying.
 🔹 **Option 3:** Increase your quota
 Submit a request via Azure Portal to increase TPM and/or RPM.
 
+**Live Debugging**
+In Azure AI Studio (Foundry), open:
 
+- **"Prompt flow → Inspect"**
+ It shows the exact token count per step, including:
+ 1. Input tokens
+ 2. Retrieved content tokens
+ 3. Output tokens
 
 
 
