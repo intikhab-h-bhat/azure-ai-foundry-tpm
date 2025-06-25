@@ -133,6 +133,15 @@ Filter files before uploading or querying.
 🔹 **Option 3:** Increase your quota
 Submit a request via Azure Portal to increase TPM and/or RPM.
 
+You control how many tokens are pulled from your knowledge files using the settings in Prompt Flow or the File Search tool. Here's exactly where to adjust those:
+**1. Prompt Flow (RAG Pipeline)**
+1. Go to your deployment project in Azure AI Foundry Studio.
+2. Open the Prompt Flow you’re using.
+3. Locate the Retrieval / Index Lookup node settings.
+4. Adjust:
+topNDocuments: Limits how many document chunks are pulled.
+strictness (or filtering threshold): Controls how aggressively irrelevant content is discarded
+
 **Live Debugging**
 In Azure AI Studio (Foundry), open:
 
