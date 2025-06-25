@@ -142,6 +142,23 @@ You control how many tokens are pulled from your knowledge files using the setti
 topNDocuments: Limits how many document chunks are pulled.
 strictness (or filtering threshold): Controls how aggressively irrelevant content is discarded
 
+**2. Agent/File Search Tool**
+If you're using an Agent equipped with a File Search tool:
+1. Go to your Agent configuration in the Studio.
+2. Find the File Search tool settings.
+3. Note the default settings are:
+- Chunk size: ~800 tokens
+- Overlap: 400 tokens
+- Max chunks: 20
+To reduce tokens:
+Lower "Maximum number of chunks added to context" from 20 to, say, 5–10.
+Or reduce the chunk size (e.g., from 800 to 400).
+**Why This Matters**
+If each chunk is ~800 tokens:
+- 20 chunks = 16,000 tokens of retrieved content
+- Plus your 1,000‑token prompt and response = ~17,000 tokens per request
+- If you make just 3 of these per minute → ~51,000 TPM → exceeds your 50k TPM limit
+
 **Live Debugging**
 In Azure AI Studio (Foundry), open:
 
